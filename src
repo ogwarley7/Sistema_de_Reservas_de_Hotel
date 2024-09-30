@@ -1,0 +1,102 @@
+-- Desativa a proteção contra atualizações inseguras
+SET SQL_SAFE_UPDATES = 0;
+
+-- Exclui e recria o banco de dados
+DROP DATABASE IF EXISTS hotelManagentSystem;
+CREATE DATABASE hotelManagentSystem;
+USE hotelManagentSystem;
+
+-- Cria a tabela de hóspedes
+CREATE TABLE hospedes (
+    id_hospede INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    telefone VARCHAR(15),
+    email VARCHAR(100) NOT NULL
+);
+
+-- Cria a tabela de quartos
+CREATE TABLE quartos (
+    id_quarto INT AUTO_INCREMENT PRIMARY KEY,
+    numero INT NOT NULL UNIQUE,
+    tipo VARCHAR(50) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL
+);
+
+-- Cria a tabela de reservas
+CREATE TABLE reservas (
+    id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+    id_hospede INT,
+    id_quarto INT,
+    data_checkin DATE NOT NULL,
+    data_checkout DATE NOT NULL,
+    FOREIGN KEY (id_hospede) REFERENCES hospedes(id_hospede) ON DELETE CASCADE,
+    FOREIGN KEY (id_quarto) REFERENCES quartos(id_quarto)
+);
+
+-- Insere dados na tabela de hóspedes
+INSERT INTO hospedes (nome, telefone, email) VALUES
+('davi', '4899146721', 'davizinho@gmail.com'),
+('fernando', '4865796543', 'fernadozinho@gmail.com'),
+('warley', '4876405626', 'warleyzinho@gmail.com'),
+('ryan', '4851200995', 'ryanzinho@gmail.com'),
+('brayan', '4866653219', 'brayanzinho@gmail.com');
+
+-- Insere dados na tabela de quartos
+INSERT INTO quartos (numero, tipo, preco) VALUES
+(1, 'single', 100.00),
+(2, 'double', 200.00),
+(3, 'suite', 350.00),
+(4, 'double', 200.00),
+(5, 'single', 100.00);
+
+-- Insere dados na tabela de reservas
+INSERT INTO reservas (id_hospede, id_quarto, data_checkin, data_checkout) VALUES
+(1, 1, '2007-08-01', '2007-08-03'),
+(2, 2, '2007-08-17', '2007-08-21'),
+(3, 3, '2008-02-12', '2008-02-20'),
+(4, 4, '2024-12-25', '2025-01-01'),
+(5, 5, '2025-01-05', '2025-01-09');
+
+-- Consulta para exibir hóspedes, quartos e reservas
+SELECT h.nome AS Hóspede, q.numero AS Quarto, q.tipo AS Tipo, q.preco AS preço,
+       r.data_checkin AS Checkin, r.data_checkout AS Checkout
+FROM reservas r
+JOIN hospedes h ON r.id_hospede = h.id_hospede
+JOIN quartos q ON r.id_quarto = q.id_quarto;
+
+-- Consulta para exibir quartos disponíveis em uma determinada faixa de datas
+SELECT q.numero AS Quarto, q.tipo AS Tipo, q.preco AS Preço
+FROM quartos q
+LEFT JOIN reservas r ON q.id_quarto = r.id_quarto
+AND (r.data_checkin <= '2007-08-21' AND r.data_checkout >= '2007-08-17')
+WHERE r.id_quarto IS NULL;
+
+-- Atualiza os dados do hóspede com id 1
+UPDATE hospedes
+SET telefone = '123456789', email = 'gameplayzinhno@gmail.com'
+WHERE id_hospede = 1;
+
+-- Atualiza o preço do quarto com id 1
+UPDATE quartos
+SET preco = 150
+WHERE id_quarto = 1;
+
+-- Exclui as reservas do hóspede com id 1
+DELETE FROM reservas
+WHERE id_hospede = 1;
+
+-- Exclui o hóspede com id 1
+DELETE FROM hospedes
+WHERE id_hospede = 1;
+
+-- Exclui a reserva com id 4 da tabela de reservas
+DELETE FROM reservas
+WHERE id_reserva = 4;
+
+-- Exclui o hóspede com id 5 da tabela de hóspedes
+DELETE FROM hospedes
+WHERE id_hospede = 5;
+
+-- Exclui as reservas do hóspede com id 5 da tabela de reservas
+DELETE FROM reservas
+WHERE id_hospede = 5;
