@@ -1,24 +1,23 @@
-# Sistema de Vendas
+# Sistema de Gerenciamento de Hotel
 
-Este projeto é um sistema de gerenciamento de vendas que permite o registro de clientes, produtos e vendas realizadas. O banco de dados é implementado em MySQL e fornece uma estrutura para armazenar e consultar informações relacionadas a vendas.
+Este projeto é um sistema de gerenciamento para hotéis que possibilita o cadastro e a gestão de hóspedes, quartos e reservas. O banco de dados é implementado em MySQL e foi estruturado para simplificar a operação diária de um hotel.
 
 ## Estrutura do Banco de Dados
 
-O banco de dados contém as seguintes tabelas:
+O banco de dados é composto pelas seguintes tabelas:
 
-- **Clientes**: Armazena informações dos clientes, incluindo nome, email e telefone.
-- **Produtos**: Armazena informações dos produtos disponíveis para venda, incluindo nome, preço e quantidade em estoque.
-- **Vendas**: Registra as vendas realizadas, associando clientes e produtos, além de armazenar a quantidade vendida e a data da venda.
+- **hóspedes**: Armazena informações dos hóspedes, como nome, telefone e email.
+- **quartos**: Contém informações sobre os quartos disponíveis, incluindo número, tipo e preço.
+- **reservas**: Registra as reservas realizadas, associando hóspedes e quartos, além das datas de check-in e check-out.
 
 ## Funcionalidades
 
-- Cadastro de clientes.
-- Cadastro de produtos.
-- Registro de vendas.
-- Consultas para visualizar vendas, produtos e clientes.
-- Atualização do estoque de produtos.
-- Atualização das informações de clientes.
-- Deleção de vendas e clientes.
+- Cadastro de hóspedes.
+- Cadastro de quartos.
+- Registro de reservas.
+- Consultas para exibir hóspedes, quartos e reservas.
+- Atualização de informações de hóspedes e preços de quartos.
+- Deleção de reservas e hóspedes.
 
 ## Instalação
 
@@ -26,119 +25,107 @@ Para instalar e executar o projeto, siga os passos abaixo:
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/sistema_vendas.git
-   cd sistema_vendas
--- Criação do banco de dados
-DROP DATABASE sistema_vendas;
+   git clone https://github.com/seu-usuario/hotel_management_system.git
+   cd hotel_management_system
+-- Desativa a proteção contra atualizações inseguras
 SET SQL_SAFE_UPDATES = 0;
-CREATE DATABASE sistema_vendas;
-USE sistema_vendas;
 
--- Criação da tabela de Clientes
-CREATE TABLE Clientes (
-    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+-- Exclui e recria o banco de dados
+DROP DATABASE IF EXISTS hotelManagentSystem;
+CREATE DATABASE hotelManagentSystem;
+USE hotelManagentSystem;
+
+-- Cria a tabela de hóspedes
+CREATE TABLE hospedes (
+    id_hospede INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    telefone VARCHAR(15)
+    telefone VARCHAR(15),
+    email VARCHAR(100) NOT NULL
 );
 
--- Criação da tabela de Produtos
-CREATE TABLE Produtos (
-    id_produto INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    preco DECIMAL(10, 2) NOT NULL,
-    quantidade_estoque INT NOT NULL
+-- Cria a tabela de quartos
+CREATE TABLE quartos (
+    id_quarto INT AUTO_INCREMENT PRIMARY KEY,
+    numero INT NOT NULL UNIQUE,
+    tipo VARCHAR(50) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL
 );
 
--- Criação da tabela de Vendas
-CREATE TABLE Vendas (
-    id_venda INT AUTO_INCREMENT PRIMARY KEY,
-    id_cliente INT,
-    id_produto INT,
-    quantidade_vendida INT NOT NULL,
-    data_venda DATE NOT NULL,
-    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
-    FOREIGN KEY (id_produto) REFERENCES Produtos(id_produto)
+-- Cria a tabela de reservas
+CREATE TABLE reservas (
+    id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+    id_hospede INT,
+    id_quarto INT,
+    data_checkin DATE NOT NULL,
+    data_checkout DATE NOT NULL,
+    FOREIGN KEY (id_hospede) REFERENCES hospedes(id_hospede) ON DELETE CASCADE,
+    FOREIGN KEY (id_quarto) REFERENCES quartos(id_quarto)
 );
--- Inserção de clientes
-INSERT INTO Clientes (nome, email, telefone) VALUES
-('Maria Silva', 'maria.silva@example.com', '(11) 98765-4321'),
-('João Oliveira', 'joao.oliveira@example.com', '(21) 97654-3210'),
-('Ana Costa', 'ana.costa@example.com', '(31) 96543-2109');
 
--- Inserção de produtos
-INSERT INTO Produtos (nome, preco, quantidade_estoque) VALUES
-('Produto A', 50.00, 100),
-('Produto B', 30.00, 150),
-('Produto C', 20.00, 200);
+-- Insere dados na tabela de hóspedes
+INSERT INTO hospedes (nome, telefone, email) VALUES
+('davi', '4899146721', 'davizinho@gmail.com'),
+('fernando', '4865796543', 'fernadozinho@gmail.com'),
+('warley', '4876405626', 'warleyzinho@gmail.com'),
+('ryan', '4851200995', 'ryanzinho@gmail.com'),
+('brayan', '4866653219', 'brayanzinho@gmail.com');
 
--- Inserção de vendas
-INSERT INTO Vendas (id_cliente, id_produto, quantidade_vendida, data_venda) VALUES
-(1, 1, 2, '2024-08-01'),
-(2, 2, 1, '2024-08-02'),
-(3, 3, 5, '2024-08-03'),
-(1, 2, 3, '2024-08-04'),
-(2, 1, 1, '2024-08-05');
--- Consulta para mostrar todas as vendas, incluindo o nome do cliente e o nome do produto
-SELECT 
-    V.id_venda,
-    C.nome AS nome_cliente,
-    P.nome AS nome_produto,
-    V.quantidade_vendida,
-    V.data_venda
-FROM 
-    Vendas V
-JOIN 
-    Clientes C ON V.id_cliente = C.id_cliente
-JOIN 
-    Produtos P ON V.id_produto = P.id_produto;
+-- Insere dados na tabela de quartos
+INSERT INTO quartos (numero, tipo, preco) VALUES
+(1, 'single', 100.00),
+(2, 'double', 200.00),
+(3, 'suite', 350.00),
+(4, 'double', 200.00),
+(5, 'single', 100.00);
 
--- Consulta para mostrar todas as compras realizadas por um cliente específico
--- Substitua o id_cliente pelo ID do cliente desejado, por exemplo, 1 para Maria Silva
-SELECT 
-    V.id_venda,
-    P.nome AS nome_produto,
-    V.quantidade_vendida,
-    V.data_venda
-FROM 
-    Vendas V
-JOIN 
-    Produtos P ON V.id_produto = P.id_produto
-WHERE 
-    V.id_cliente = 1;
+-- Insere dados na tabela de reservas
+INSERT INTO reservas (id_hospede, id_quarto, data_checkin, data_checkout) VALUES
+(1, 1, '2007-08-01', '2007-08-03'),
+(2, 2, '2007-08-17', '2007-08-21'),
+(3, 3, '2008-02-12', '2008-02-20'),
+(4, 4, '2024-12-25', '2025-01-01'),
+(5, 5, '2025-01-05', '2025-01-09');
 
--- Consulta para exibir o total de vendas realizadas por produto
-SELECT 
-    P.nome AS nome_produto,
-    SUM(V.quantidade_vendida) AS total_vendido
-FROM 
-    Vendas V
-JOIN 
-    Produtos P ON V.id_produto = P.id_produto
-GROUP BY 
-    P.nome;
--- Atualização do estoque de um produto após uma venda
--- Substitua o id_produto e a quantidade_vendida conforme necessário
-UPDATE Produtos
-SET quantidade_estoque = quantidade_estoque - 2
-WHERE id_produto = 1;
+-- Consulta para exibir hóspedes, quartos e reservas
+SELECT h.nome AS Hóspede, q.numero AS Quarto, q.tipo AS Tipo, q.preco AS preço,
+       r.data_checkin AS Checkin, r.data_checkout AS Checkout
+FROM reservas r
+JOIN hospedes h ON r.id_hospede = h.id_hospede
+JOIN quartos q ON r.id_quarto = q.id_quarto;
 
--- Atualização das informações de um cliente
--- Substitua o id_cliente e as novas informações conforme necessário
-UPDATE Clientes
-SET telefone = '(11) 91234-5678'
-WHERE id_cliente = 1;
+-- Consulta para exibir quartos disponíveis em uma determinada faixa de datas
+SELECT q.numero AS Quarto, q.tipo AS Tipo, q.preco AS Preço
+FROM quartos q
+LEFT JOIN reservas r ON q.id_quarto = r.id_quarto
+AND (r.data_checkin <= '2007-08-21' AND r.data_checkout >= '2007-08-17')
+WHERE r.id_quarto IS NULL;
 
--- Deleção de uma venda
--- Substitua o id_venda pelo ID da venda a ser deletada
-DELETE FROM Vendas
-WHERE id_venda = 1;
+-- Atualiza os dados do hóspede com id 1
+UPDATE hospedes
+SET telefone = '123456789', email = 'gameplayzinhno@gmail.com'
+WHERE id_hospede = 1;
 
--- Deleção de um cliente e suas vendas associadas (se necessário)
--- Primeiro, deletar as vendas associadas
-DELETE FROM Vendas
-WHERE id_cliente = 1;
+-- Atualiza o preço do quarto com id 1
+UPDATE quartos
+SET preco = 150
+WHERE id_quarto = 1;
 
--- Depois, deletar o cliente
-DELETE FROM Clientes
-WHERE id_cliente = 1;
+-- Exclui as reservas do hóspede com id 1
+DELETE FROM reservas
+WHERE id_hospede = 1;
+
+-- Exclui o hóspede com id 1
+DELETE FROM hospedes
+WHERE id_hospede = 1;
+
+-- Exclui a reserva com id 4 da tabela de reservas
+DELETE FROM reservas
+WHERE id_reserva = 4;
+
+-- Exclui o hóspede com id 5 da tabela de hóspedes
+DELETE FROM hospedes
+WHERE id_hospede = 5;
+
+-- Exclui as reservas do hóspede com id 5 da tabela de reservas
+DELETE FROM reservas
+WHERE id_hospede = 5;
