@@ -1,0 +1,5 @@
+ Sistema de Gerenciamento de Hotel
+
+Este projeto consiste em um sistema de gerenciamento de hotel que permite registrar hóspedes, quartos e reservas. 
+O sistema foi desenvolvido utilizando SQL e é projetado para facilitar a administração das operações do hotel,
+proporcionando um controle eficiente sobre a disponibilidade de quartos e informações dos hóspedes.
